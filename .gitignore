@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 
-sanity-cms/.env
+sanity-cms/.env*
