@@ -119,23 +119,29 @@ The server will start on `http://localhost:8001`
 ## User Roles
 
 ### Super Admin
-- Full access to everything
-- Can create and manage admins
-- Can manage all users
-- Access to user management backdoor
+- **Same permissions as Admin** (full access to all features)
+- **Protected account**: Cannot be deleted or modified
+- **User Management**: Can create, modify, and delete Admin accounts
+- Fixed account created on first server run
+- The only role that can manage other admin accounts
 
 ### Admin
-- Can approve/reject volunteer applications
-- Can create and assign tasks
-- Can manage content, events, urgent needs, gallery
-- Can review volunteer hours
-- Cannot manage other admins
+- Full access to all NGO management features:
+  - Approve/reject volunteer applications
+  - Create and assign tasks
+  - Manage content, events, urgent needs, gallery
+  - Review volunteer hours
+  - Manage volunteers
+- **Can be created/deleted by Super Admin only**
+- **Role can be changed by Super Admin**
+- Cannot manage other admin accounts
 
 ### Volunteer
 - Can view and update assigned tasks
 - Can log volunteer hours
 - Can view events
 - Can update their own profile
+- Limited to volunteer-specific features
 
 ## Initial Super Admin Account
 
