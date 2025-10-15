@@ -144,14 +144,35 @@ router.patch('/:id/role', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Update user status (Super Admin only)
-router.patch('/:id/status', verifyToken, requireSuperAdmin, async (req, res) => {
+// Update user status (Admin and Super Admin, but cannot deactivate Super Admin)
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
     if (!['active', 'inactive'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    // Get the target user
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', id)
+      .single();
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent deactivating Super Admin
+    if (targetUser.role === 'super_admin') {
+      return res.status(403).json({ error: 'Cannot deactivate Super Admin account' });
+    }
+
+    // Only Super Admin can deactivate other admins
+    if (targetUser.role === 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ error: 'Only Super Admin can modify admin status' });
     }
 
     // Prevent deactivating own account
