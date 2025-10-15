@@ -196,10 +196,31 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Delete user (Super Admin only)
-router.delete('/:id', verifyToken, requireSuperAdmin, async (req, res) => {
+// Delete user (Admin and Super Admin, but cannot delete Super Admin)
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Get the target user
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', id)
+      .single();
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent deleting Super Admin
+    if (targetUser.role === 'super_admin') {
+      return res.status(403).json({ error: 'Cannot delete Super Admin account' });
+    }
+
+    // Only Super Admin can delete other admins
+    if (targetUser.role === 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ error: 'Only Super Admin can delete admin accounts' });
+    }
 
     // Prevent deleting own account
     if (id === req.user.id) {
