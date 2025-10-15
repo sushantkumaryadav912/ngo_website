@@ -24,8 +24,8 @@ router.get('/', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Create new user (Super Admin only)
-router.post('/', verifyToken, requireSuperAdmin, async (req, res) => {
+// Create new user (Admin and Super Admin)
+router.post('/', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, role } = req.body;
 
@@ -33,7 +33,14 @@ router.post('/', verifyToken, requireSuperAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Name, email, and role are required' });
     }
 
-    if (!['admin', 'volunteer'].includes(role)) {
+    // Only Super Admin can create other admins or super admins
+    if (role === 'admin' || role === 'super_admin') {
+      if (req.user.role !== 'super_admin') {
+        return res.status(403).json({ error: 'Only Super Admin can create admin accounts' });
+      }
+    }
+
+    if (!['admin', 'volunteer', 'super_admin'].includes(role)) {
       return res.status(400).json({ error: 'Invalid role' });
     }
 
