@@ -13,9 +13,11 @@
     "@sanity/client": "^7.11.1",
     "@sanity/image-url": "^1.2.0",
     "@tailwindcss/postcss": "^4.1.13",
+    "axios": "^1.12.2",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.4",
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
