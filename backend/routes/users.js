@@ -6,8 +6,8 @@ import { sendEmail, emailTemplates } from '../config/email.js';
 
 const router = express.Router();
 
-// Get all users (Super Admin only)
-router.get('/', verifyToken, requireSuperAdmin, async (req, res) => {
+// Get all users (Admin and Super Admin)
+router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { data: users, error } = await supabase
       .from('users')
