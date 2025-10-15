@@ -55,12 +55,12 @@ The server will start on `http://localhost:8001`
 - `POST /api/auth/change-password` - Change password
 - `POST /api/auth/logout` - Logout
 
-### User Management (Super Admin only)
+### User Management (Admin & Super Admin)
 - `GET /api/users` - Get all users
-- `POST /api/users` - Create new user
-- `PATCH /api/users/:id/role` - Update user role
-- `PATCH /api/users/:id/status` - Update user status
-- `DELETE /api/users/:id` - Delete user
+- `POST /api/users` - Create new user (Super Admin can create admins, Admins can create volunteers)
+- `PATCH /api/users/:id/role` - Update user role (Super Admin only for admin roles)
+- `PATCH /api/users/:id/status` - Update user status (Super Admin only for admins)
+- `DELETE /api/users/:id` - Delete user (Super Admin only for admins, cannot delete Super Admin)
 
 ### Volunteers
 - `POST /api/volunteers/apply` - Submit volunteer application (public)
