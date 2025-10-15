@@ -35,12 +35,12 @@ export const requireRole = (...roles) => {
   };
 };
 
-// Check if user is Super Admin
+// Check if user is Super Admin (for user management only)
 export const requireSuperAdmin = (req, res, next) => {
   return requireRole('super_admin')(req, res, next);
 };
 
-// Check if user is Admin or Super Admin
+// Check if user is Admin or Super Admin (both have same permissions)
 export const requireAdmin = (req, res, next) => {
   return requireRole('super_admin', 'admin')(req, res, next);
 };
