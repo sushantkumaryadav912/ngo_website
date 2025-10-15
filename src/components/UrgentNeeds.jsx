@@ -14,6 +14,7 @@ const UrgentNeeds = () => {
   const fetchUrgentNeeds = async () => {
     try {
       const needs = await client.fetch(urgentNeedsQuery)
+      console.log('Fetched needs:', needs);
       setUrgentNeeds(needs)
     } catch (error) {
       console.error('Error fetching urgent needs:', error)
