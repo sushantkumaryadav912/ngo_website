@@ -8,10 +8,15 @@ import DashboardModal from '../../components/dashboard/DashboardModal'
 import { contentAPI } from '../../services/api'
 
 const CONTENT_TYPES = [
-  { label: 'Announcements', value: 'announcements' },
-  { label: 'Resident Stories', value: 'resident-stories' },
-  { label: 'Success Stories', value: 'success-stories' },
-  { label: 'Blog Posts', value: 'blog-posts' },
+  { label: 'Announcements', value: 'announcements', singular: 'Announcement' },
+  { label: 'Resident Stories', value: 'resident-stories', singular: 'Story' },
+  { label: 'Success Stories', value: 'success-stories', singular: 'Success Story' },
+  { label: 'Blog Posts', value: 'blog-posts', singular: 'Blog Post' },
+  { label: 'Home — Hero', value: 'home-hero', singular: 'Hero Section' },
+  { label: 'Home — About', value: 'home-about', singular: 'About Section' },
+  { label: 'Home — Services', value: 'home-services', singular: 'Services Section' },
+  { label: 'Home — Donation', value: 'home-donation', singular: 'Donation Section' },
+  { label: 'Contact Info', value: 'contact-info', singular: 'Contact Entry' },
 ]
 
 const STATUS_OPTIONS = [
@@ -26,6 +31,7 @@ const contentSchema = z.object({
   content: z.string().min(10, 'Full content must be at least 10 characters'),
   image_url: z.string().url('Enter a valid image URL').or(z.literal('')).optional(),
   status: z.enum(['draft', 'published', 'archived']),
+  metadata: z.string().optional(),
 })
 
 const defaultValues = {
@@ -34,6 +40,7 @@ const defaultValues = {
   content: '',
   image_url: '',
   status: 'draft',
+  metadata: '',
 }
 
 const ContentManagement = () => {
@@ -92,6 +99,7 @@ const ContentManagement = () => {
       content: item.content || '',
       image_url: item.image_url || '',
       status: item.status || 'draft',
+      metadata: item.metadata ? JSON.stringify(item.metadata, null, 2) : '',
     })
     setFormOpen(true)
   }
@@ -103,11 +111,27 @@ const ContentManagement = () => {
   }
 
   const onSubmit = async (values) => {
+    let parsedMetadata = {}
+
+    if (values.metadata) {
+      try {
+        parsedMetadata = JSON.parse(values.metadata)
+      } catch (error) {
+        toast.error('Metadata must be valid JSON')
+        return
+      }
+    }
+
     const payload = {
       ...values,
       type,
       image_url: values.image_url || null,
-      metadata: {},
+      metadata: parsedMetadata,
+    }
+
+    delete payload.metadata
+    if (values.metadata) {
+      payload.metadata = parsedMetadata
     }
 
     try {
@@ -172,7 +196,7 @@ const ContentManagement = () => {
             className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700"
           >
             <Plus className="h-4 w-4" />
-            New {CONTENT_TYPES.find((item) => item.value === type)?.label?.slice(0, -1)}
+            New {CONTENT_TYPES.find((item) => item.value === type)?.singular ?? 'Entry'}
           </button>
         </div>
       </header>
@@ -317,6 +341,20 @@ const ContentManagement = () => {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 flex items-center justify-between">
+              Metadata (JSON)
+              <span className="text-xs text-gray-400">Configure section-specific settings</span>
+            </label>
+            <textarea
+              rows={6}
+              {...register('metadata')}
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100"
+              placeholder='e.g. { "subtitle": "Our mission", "stats": [{ "label": "Impact", "value": "1000+" }] }'
+            />
+            {errors.metadata && <p className="mt-1 text-xs text-red-500">{errors.metadata.message}</p>}
           </div>
         </form>
       </DashboardModal>

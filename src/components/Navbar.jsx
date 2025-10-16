@@ -4,7 +4,7 @@ import GoogleTranslate from './GoogleTranslate'
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('home')
+  const [activeSection, setActiveSection] = useState('hero')
 
   // Handle scroll effects and active section detection
   useEffect(() => {
@@ -13,7 +13,7 @@ const Navbar = () => {
       setIsScrolled(scrollPosition > 50)
 
       // Determine active section based on scroll position
-      const sections = ['home', 'about', 'services', 'gallery', 'contact']
+  const sections = ['hero', 'about', 'services', 'gallery', 'contact']
       const sectionOffsets = sections.map(section => {
         const element = document.getElementById(section)
         return element ? element.offsetTop - 100 : 0
@@ -67,7 +67,7 @@ const Navbar = () => {
   }, [isMobileMenuOpen])
 
   const navItems = [
-    { name: 'Home', id: 'home' },
+    { name: 'Home', id: 'hero' },
     { name: 'About', id: 'about' },
     { name: 'Services', id: 'services' },
     { name: 'Gallery', id: 'gallery' },
