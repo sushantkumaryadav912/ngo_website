@@ -1,7 +1,7 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
-import { generateUUID, hashPassword, sanitizeUser } from '../utils/helpers.js';
-import { verifyToken, requireAdmin, requireVolunteer } from '../middleware/auth.js';
+import { generateUUID, hashPassword } from '../utils/helpers.js';
+import { verifyToken, requireAdmin } from '../middleware/auth.js';
 import { sendEmail, emailTemplates } from '../config/email.js';
 
 const router = express.Router();
@@ -199,6 +199,139 @@ router.patch('/:id/reject', verifyToken, requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('Reject volunteer error:', error);
     res.status(500).json({ error: 'Failed to reject volunteer' });
+  }
+});
+
+// Update volunteer details (Admin)
+router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, age, skills, availability, experience, motivation, emergency_contact, status } = req.body;
+
+    const { data: volunteerExists } = await supabase
+      .from('volunteers')
+      .select('id, email')
+      .eq('id', id)
+      .single();
+
+    if (!volunteerExists) {
+      return res.status(404).json({ error: 'Volunteer not found' });
+    }
+
+    const updateData = {
+      updated_at: new Date().toISOString()
+    };
+
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (age !== undefined) updateData.age = age;
+    if (skills !== undefined) updateData.skills = skills;
+    if (availability !== undefined) updateData.availability = availability;
+    if (experience !== undefined) updateData.experience = experience;
+    if (motivation !== undefined) updateData.motivation = motivation;
+    if (emergency_contact !== undefined) updateData.emergency_contact = emergency_contact;
+    if (status !== undefined) updateData.status = status;
+
+    if (email && email !== volunteerExists.email) {
+      const { data: duplicate } = await supabase
+        .from('volunteers')
+        .select('id')
+        .eq('email', email)
+        .neq('id', id)
+        .maybeSingle();
+
+      if (duplicate) {
+        return res.status(400).json({ error: 'Email already in use by another volunteer' });
+      }
+    }
+
+    const { data: updatedVolunteer, error } = await supabase
+      .from('volunteers')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Keep linked user (if any) in sync
+    const { data: linkedUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('volunteer_id', id)
+      .maybeSingle();
+
+    if (linkedUser) {
+      const userUpdate = {};
+
+      if (name !== undefined) userUpdate.name = name;
+      if (email !== undefined) userUpdate.email = email;
+
+      if (status !== undefined) {
+        if (['approved', 'active'].includes(status)) {
+          userUpdate.status = 'active';
+        } else if (['rejected', 'inactive'].includes(status)) {
+          userUpdate.status = 'inactive';
+        }
+      }
+
+      if (Object.keys(userUpdate).length > 0) {
+        userUpdate.updated_at = new Date().toISOString();
+
+        const { error: userUpdateError } = await supabase
+          .from('users')
+          .update(userUpdate)
+          .eq('id', linkedUser.id);
+
+        if (userUpdateError) {
+          console.error('Linked user sync error:', userUpdateError);
+        }
+      }
+    }
+
+    res.json(updatedVolunteer);
+  } catch (error) {
+    console.error('Update volunteer error:', error);
+    res.status(500).json({ error: 'Failed to update volunteer' });
+  }
+});
+
+// Delete volunteer (Admin)
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: volunteer } = await supabase
+      .from('volunteers')
+      .select('id')
+      .eq('id', id)
+      .single();
+
+    if (!volunteer) {
+      return res.status(404).json({ error: 'Volunteer not found' });
+    }
+
+    const { error: userDeleteError } = await supabase
+      .from('users')
+      .delete()
+      .eq('volunteer_id', id);
+
+    if (userDeleteError) {
+      console.error('Linked user delete error:', userDeleteError);
+    }
+
+    const { error } = await supabase
+      .from('volunteers')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.json({ message: 'Volunteer deleted successfully' });
+  } catch (error) {
+    console.error('Delete volunteer error:', error);
+    res.status(500).json({ error: 'Failed to delete volunteer' });
   }
 });
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
-import { hashPassword, comparePassword, generateToken, sanitizeUser, generateUUID } from '../utils/helpers.js';
-import { verifyToken, requireSuperAdmin, requireAdmin } from '../middleware/auth.js';
+import { hashPassword, comparePassword, generateToken, sanitizeUser } from '../utils/helpers.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -112,6 +112,37 @@ router.post('/change-password', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Change password error:', error);
     res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+// Update profile
+router.patch('/profile', verifyToken, async (req, res) => {
+  try {
+    const { full_name, phone, address, emergency_contact_name, emergency_contact_phone } = req.body;
+
+    const updateData = {
+      updated_at: new Date().toISOString()
+    };
+
+    if (full_name !== undefined) updateData.full_name = full_name;
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+    if (emergency_contact_name !== undefined) updateData.emergency_contact_name = emergency_contact_name;
+    if (emergency_contact_phone !== undefined) updateData.emergency_contact_phone = emergency_contact_phone;
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', req.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ message: 'Profile updated successfully', user: sanitizeUser(user) });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 

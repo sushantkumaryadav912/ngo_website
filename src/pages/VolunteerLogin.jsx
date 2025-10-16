@@ -38,7 +38,8 @@ const VolunteerLogin = () => {
         setError(result.error || 'Login failed')
         setLoading(false)
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Volunteer login failed:', error)
       setError('An error occurred. Please try again.')
       setLoading(false)
     }

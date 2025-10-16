@@ -42,6 +42,7 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   getMe: () => api.get('/auth/me'),
+  updateProfile: (data) => api.patch('/auth/profile', data),
   changePassword: (data) => api.post('/auth/change-password', data),
   logout: () => api.post('/auth/logout'),
 };
@@ -62,6 +63,8 @@ export const volunteerAPI = {
   getById: (id) => api.get(`/volunteers/${id}`),
   approve: (id) => api.patch(`/volunteers/${id}/approve`),
   reject: (id, reason) => api.patch(`/volunteers/${id}/reject`, { reason }),
+  update: (id, data) => api.patch(`/volunteers/${id}`, data),
+  delete: (id) => api.delete(`/volunteers/${id}`),
   getStats: () => api.get('/volunteers/stats/overview'),
 };
 

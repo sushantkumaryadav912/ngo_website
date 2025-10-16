@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import PublicLayout from './layouts/PublicLayout'
 import DashboardLayout from './layouts/DashboardLayout'
 import VolunteerPortalLayout from './layouts/VolunteerPortalLayout'
@@ -21,40 +22,43 @@ import Profile from './pages/Profile'
 
 function App() {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<PublicLayout />}>
-        <Route index element={<HomePage />} />
-      </Route>
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<PublicLayout />}>
+          <Route index element={<HomePage />} />
+        </Route>
 
-      {/* Dashboard Login */}
-      <Route path="/dashboard" element={<DashboardLogin />} />
-      
-      {/* Admin Dashboard Routes */}
-      <Route path="/dashboard/*" element={<DashboardLayout />}>
-        <Route path="home" element={<AdminDashboard />} />
-        <Route path="volunteers" element={<VolunteerManagement />} />
-        <Route path="tasks" element={<TaskManagement />} />
-        <Route path="events" element={<EventManagement />} />
-        <Route path="content" element={<ContentManagement />} />
-        <Route path="urgent-needs" element={<UrgentNeedsManagement />} />
-        <Route path="gallery" element={<GalleryManagement />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="profile" element={<Profile />} />
-      </Route>
+        {/* Dashboard Login */}
+        <Route path="/dashboard" element={<DashboardLogin />} />
+        
+        {/* Admin Dashboard Routes */}
+        <Route path="/dashboard/*" element={<DashboardLayout />}>
+          <Route path="home" element={<AdminDashboard />} />
+          <Route path="volunteers" element={<VolunteerManagement />} />
+          <Route path="tasks" element={<TaskManagement />} />
+          <Route path="events" element={<EventManagement />} />
+          <Route path="content" element={<ContentManagement />} />
+          <Route path="urgent-needs" element={<UrgentNeedsManagement />} />
+          <Route path="gallery" element={<GalleryManagement />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
 
-      {/* Volunteer Portal Login */}
-      <Route path="/volunteer-portal" element={<VolunteerLogin />} />
+        {/* Volunteer Portal Login */}
+        <Route path="/volunteer-portal" element={<VolunteerLogin />} />
 
-      {/* Volunteer Portal Routes */}
-      <Route path="/volunteer-portal/*" element={<VolunteerPortalLayout />}>
-        <Route path="home" element={<VolunteerDashboard />} />
-        <Route path="tasks" element={<VolunteerTasks />} />
-        <Route path="hours" element={<VolunteerHours />} />
-        <Route path="events" element={<VolunteerEvents />} />
-        <Route path="profile" element={<Profile />} />
-      </Route>
-    </Routes>
+        {/* Volunteer Portal Routes */}
+        <Route path="/volunteer-portal/*" element={<VolunteerPortalLayout />}>
+          <Route path="home" element={<VolunteerDashboard />} />
+          <Route path="tasks" element={<VolunteerTasks />} />
+          <Route path="hours" element={<VolunteerHours />} />
+          <Route path="events" element={<VolunteerEvents />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 

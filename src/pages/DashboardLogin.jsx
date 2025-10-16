@@ -38,7 +38,8 @@ const DashboardLogin = () => {
         setError(result.error || 'Login failed')
         setLoading(false)
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Dashboard login failed:', error)
       setError('An error occurred. Please try again.')
       setLoading(false)
     }

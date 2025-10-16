@@ -63,6 +63,6 @@ export const isValidEmail = (email) => {
 
 // Sanitize user data (remove sensitive fields)
 export const sanitizeUser = (user) => {
-  const { password, ...sanitized } = user;
+  const { password: _password, ...sanitized } = user;
   return sanitized;
 };

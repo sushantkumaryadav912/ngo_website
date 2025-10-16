@@ -1,7 +1,7 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
-import { hashPassword, generateToken, sanitizeUser, generateUUID, generateRandomPassword } from '../utils/helpers.js';
-import { verifyToken, requireSuperAdmin, requireAdmin } from '../middleware/auth.js';
+import { hashPassword, sanitizeUser, generateUUID, generateRandomPassword } from '../utils/helpers.js';
+import { verifyToken, requireAdmin } from '../middleware/auth.js';
 import { sendEmail, emailTemplates } from '../config/email.js';
 
 const router = express.Router();
